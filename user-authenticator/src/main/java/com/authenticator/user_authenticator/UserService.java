@@ -21,14 +21,14 @@ public class UserService {
         this.database = mongoClient.getDatabase("user_credentials");
     }
 
-    public void addNewUser(String username, String password, String collectionName) {
+    public boolean addNewUser(String username, String password, String collectionName) {
         MongoCollection<Document> collection = database.getCollection(collectionName);
 
         // Check if the user already exists
         Document existingUser = collection.find(Filters.eq("username", username)).first();
         if (existingUser != null) {
             System.out.println("User already exists. Choose a different username.");
-            return; // Exit the method if the user exists
+            return false; // Exit the method if the user exists
         }
 
         // Create a document for the new user
@@ -37,6 +37,7 @@ public class UserService {
         // Insert the document
         collection.insertOne(document);
         System.out.println("Document inserted successfully!");
+        return true;
     }
 
     public boolean authenticateUser(String username, String password, String collectionName) {

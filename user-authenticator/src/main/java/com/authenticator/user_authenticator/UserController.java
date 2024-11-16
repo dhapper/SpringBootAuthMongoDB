@@ -23,28 +23,39 @@ public class UserController {
         this.userService = userService;
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<User> getUserById(@PathVariable String id) {
-//        User user = userService.findUserById(id);
-//        return ResponseEntity.ok(user);
-//    }
-
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> registerUser(@RequestBody User user) {
-        userService.addNewUser(user.getUsername(), user.getPassword(), "watchlist-app");
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "User registered successfully");
+    public ResponseEntity<Map<String, Object>> registerUser(@RequestBody User user) {
+        
+        Map<String, Object> response = new HashMap<>();
+        
+        if (userService.addNewUser(user.getUsername(), user.getPassword(), "watchlist-app")) {
+            response.put("message", "User registered successfully");
+            response.put("success", true);
+        } else {
+            response.put("message", "Username already taken");
+            response.put("success", false);
+        }
+        
         return ResponseEntity.ok(response);
     }
 
 
+
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
+    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody User user) {
+        Map<String, Object> response = new HashMap<>();
+        
         boolean authenticated = userService.authenticateUser(user.getUsername(), user.getPassword(), "watchlist-app");
+        
         if (authenticated) {
-            return ResponseEntity.ok("Login successful");
+            response.put("message", "Login successful");
+            response.put("success", true);
         } else {
-            return ResponseEntity.status(401).body("Invalid credentials");
+            response.put("message", "Invalid credentials");
+            response.put("success", false);
         }
+        
+        return ResponseEntity.ok(response);
     }
+
 }
